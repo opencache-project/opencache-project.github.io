@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+  </head>
+  <body>
+    <h1><span style="color:#942930;">Open</span><span style="color:#3F4142;">Cache</span> <span style="font-weight:300">API</span></h1>
+
+    <div class='links'><a href='#'>overview</a> // <a href='docs.html'>docs</a> // <a href='tutorial.html'>tutorial</a> // <a href='research.html'>research</a> // <a href='about.html'>about</a></div>
+    <a name='external'></a>
+    <h2>External API</h2>
+
+    <p>To interface with OpenCache, a standard <a href="http://www.jsonrpc.org/specification#error_object">JSON-RPC</a> (Remote Procedure Call) can be made to the OpenCache controller. All requests must be sent via the HTTP <code>POST</code> method.</p>
+
+    <p>The following RPCs are used to interact with a an OpenCache deployment via a controller (more details for each method given below):</p>
+
+    <table>
+    <thead>
+    <tr>
+    <th> method                  </th>
+    <th> params                                          </th>
+    <th> result                            </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td> <code>start</code>                 </td>
+    <td> <code>{ ("expr" : &lt;expr&gt;), ("node" : &lt;node&gt;) }</code>      </td>
+    <td> <code>&lt;boolean&gt;</code>                       </td>
+    </tr>
+    <tr>
+    <td> <code>stop</code>                  </td>
+    <td> <code>{ ("expr" : &lt;expr&gt;), ("node" : &lt;node&gt;) }</code>      </td>
+    <td> <code>&lt;boolean&gt;</code>                       </td>
+    </tr>
+    <tr>
+    <td> <code>pause</code>                 </td>
+    <td> <code>{ ("expr" : &lt;expr&gt;), ("node" : &lt;node&gt;) }</code>      </td>
+    <td> <code>&lt;boolean&gt;</code>                       </td>
+    </tr>
+    <tr>
+    <td> <code>fetch</code>                 </td>
+    <td> <code>{ ("expr" : &lt;expr&gt;), ("node" : &lt;node&gt;) }</code>      </td>
+    <td> <code>&lt;boolean&gt;</code>                       </td>
+    </tr>
+    <tr>
+    <td> <code>seed</code>                  </td>
+    <td> <code>{ ("expr" : &lt;expr&gt;), ("node" : &lt;node&gt;) }</code>      </td>
+    <td> <code>&lt;boolean&gt;</code>                       </td>
+    </tr>
+    <tr>
+    <td> <code>refresh</code>               </td>
+    <td> <code>{ ("expr" : &lt;expr&gt;), ("node" : &lt;node&gt;) }</code>      </td>
+    <td> <code>&lt;boolean&gt;</code>                       </td>
+    </tr>
+    <tr>
+    <td> <code>stat</code>                  </td>
+    <td> <code>{ ("expr" : &lt;expr&gt;), ("node" : &lt;node&gt;) }</code>      </td>
+    <td> <code>[&lt;cache_hit&gt;, &lt;cache_miss&gt;... ]</code> </td>
+    </tr>
+    </tbody>
+    </table>
+
+
+    <p>Parameters in brackets are optional. If not included, a wildcard all (<code>*</code>) is used. A <code>&lt;node&gt;</code> can be either a single node, a vertical-bar-seperated (<code>|</code>) list of nodes or a wildcard (<code>*</code>) for all existing nodes. An <code>&lt;expr&gt;</code> can either be a single OpenCache expression, a vertical-bar-seperated (<code>|</code>) list of OpenCache expressions or a wildcard (<code>*</code>) to cache all HTTP traffic.</p>
+
+    <h3>start</h3>
+
+    <p>Start the given cache instances. Creates new instances if they do not exist, and restarts those that are paused.</p>
+
+    <p><em>Return Value:</em> Returns a <code>true</code> result message on success or an error message on failure.</p>
+
+    <h3>stop</h3>
+
+    <p>Stop the given cache instances. Prevents them from responding to requests and terminates the running instance. Content is removed from disk.</p>
+
+    <p><em>Return Value:</em> Returns a <code>true</code> result message on success or an error message on failure.</p>
+
+    <h3>pause</h3>
+
+    <p>Pause the given cache instances, temporarily stopping request handing but <em>not</em> removing content from disk. Restart again using <code>start</code> command.</p>
+
+    <p><em>Return Value:</em> Returns a <code>true</code> result message on success or an error message on failure.</p>
+
+    <h3>fetch</h3>
+
+    <p>Fetch and retrieve an object from a remote location. Considered as 'pre-caching' content on the node, ready to serve subsequent requests. Similar to a 'cache-miss' event, where content is not present in the cache and must be retrieved.</p>
+
+    <p><em>Return Value:</em> Returns a <code>true</code> result message on success or an error message on failure.</p>
+
+    <h3>seed</h3>
+
+    <p>Artifically add a number of fully resolved expressions to the given nodes. Each one of these expressions is seen as equivalent to each other, and will serve the same content given a request. For example, this feature can be used to define a single object, stored in multiple locations; with the use of <code>seed</code>, the object will only be stored once in each node, reducing storage utilisation.</p>
+
+    <p><em>Return Value:</em> Returns a <code>true</code> result message on success or an error message on failure.</p>
+
+    <h3>refresh</h3>
+
+    <p>Manually request fresh statistics from given cache instances. Does not rely on periodic reporting. Useful if you want the most up to date statistics.</p>
+
+    <p><em>Return Value:</em> Returns a <code>true</code> result message on success or an error message on failure.</p>
+
+    <h3>stat</h3>
+
+    <p>Return aggregate statistics for  given cache instances. These stats are stored at the controller to reduce latency. Cache instances will periodically report stats back to the controller. To manually request fresh statistics from given cache instances, use the <code>refresh</code> command before this (it may also be necessary to insert a delay to ensure fresh statistics are received back to the controller from all cache instances). Stats are kept for a predefined period of time that is configurable.</p>
+
+    <p><em>Return Value:</em></p>
+
+    <table>
+    <thead>
+    <tr>
+    <th> field                     </th>
+    <th> note                                                                                          </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td> <code>start</code>                   </td>
+    <td> number of cache instances in 'start' state.                                                   </td>
+    </tr>
+    <tr>
+    <td> <code>stop</code>                    </td>
+    <td> number of cache instances in 'stop' state.                                                    </td>
+    </tr>
+    <tr>
+    <td> <code>pause</code>                   </td>
+    <td> number of cache instances in 'paused' state.                                                  </td>
+    </tr>
+    <tr>
+    <td> <code>cache_miss</code>              </td>
+    <td> number of cache miss (content not found in cache) events (one per request).                   </td>
+    </tr>
+    <tr>
+    <td> <code>cache_miss_size</code>         </td>
+    <td> number of bytes served whilst handling cache miss (content not found in cache) events.        </td>
+    </tr>
+    <tr>
+    <td> <code>cache_hit</code>               </td>
+    <td> number of cache hit (content already found in cache) events (one per request).                </td>
+    </tr>
+    <tr>
+    <td> <code>cache_hit_size</code>          </td>
+    <td> number of bytes served whilst handling cache hit (content already found in cache) events.     </td>
+    </tr>
+    <tr>
+    <td> <code>cache_object</code>            </td>
+    <td> number of objects currently stored by the cache.                                              </td>
+    </tr>
+    <tr>
+    <td> <code>cache_object_size</code>       </td>
+    <td> number of bytes for the cached objects on disk (actual).                                      </td>
+    </tr>
+    <tr>
+    <td> <code>total_node_count</code>        </td>
+    <td> number of unique node IDs present in results                                                  </td>
+    </tr>
+    <tr>
+    <td> <code>total_expr_count</code>        </td>
+    <td> number of unique expressions present in results                                               </td>
+    </tr>
+    <tr>
+    <td> <code>total_response_count</code>    </td>
+    <td> number of unique responses seen                                                               </td>
+    </tr>
+    <tr>
+    <td> <code>node_seen</code>               </td>
+    <td> list of those node IDs present in results                                                     </td>
+    </tr>
+    <tr>
+    <td> <code>expr_seen</code>               </td>
+    <td> list of those expressions present in results                                                  </td>
+    </tr>
+    <tr>
+    <td> <code>node_expr_pairs_seen</code>    </td>
+    <td> pairs of nodes and expressions present in results, including current status and average load  </td>
+    </tr>
+    </tbody>
+    </table>
+  </body>
+  <footer>
+    &#169; Matthew Broadbent 2015
+  </footer>
+</html>
